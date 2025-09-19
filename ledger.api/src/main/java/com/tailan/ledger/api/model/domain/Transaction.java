@@ -3,6 +3,8 @@ package com.tailan.ledger.api.model.domain;
 import com.tailan.ledger.api.model.enums.TransactionType;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "transactions")
 public class Transaction {
@@ -14,14 +16,24 @@ public class Transaction {
     private Account account;
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
+    private LocalDateTime dateTime;
 
     public Transaction() {
     }
 
-    public Transaction(Long id, Account account, TransactionType transactionType) {
+    public Transaction(Long id, Account account, TransactionType transactionType, LocalDateTime dateTime) {
         this.id = id;
         this.account = account;
         this.transactionType = transactionType;
+        this.dateTime = dateTime;
+    }
+
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
     }
 
     public Long getId() {
