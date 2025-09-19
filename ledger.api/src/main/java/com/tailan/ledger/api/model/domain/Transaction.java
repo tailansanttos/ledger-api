@@ -12,6 +12,9 @@ public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true)
+    private String externalId;
+
     @ManyToOne
     @JoinColumn(name = "account_id")
     private Account account;
@@ -31,8 +34,17 @@ public class Transaction {
         this.value = value;
     }
 
-    public Transaction(Long id, Account account, TransactionType transactionType, LocalDateTime dateTime, BigDecimal value) {
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
+
+    public Transaction(Long id, String externalId, Account account, TransactionType transactionType, LocalDateTime dateTime, BigDecimal value) {
         this.id = id;
+        this.externalId = externalId;
         this.account = account;
         this.transactionType = transactionType;
         this.dateTime = dateTime;
