@@ -7,6 +7,7 @@ import com.tailan.ledger.api.model.repositories.AccountRepository;
 import com.tailan.ledger.api.service.AccountService;
 import org.springframework.stereotype.Service;
 
+import javax.security.auth.login.AccountNotFoundException;
 import java.math.BigDecimal;
 
 @Service
@@ -26,5 +27,30 @@ public class AccountServiceIml implements AccountService {
         return new AccountResponse(savedAccount.getId(),
                 savedAccount.getHolderName(),
                 savedAccount.getBalance());
+    }
+
+    @Override
+    public Account getAccount(Long accountId) {
+        Account account = null;
+        try {
+            account = accountRepository.findById(accountId).orElseThrow(() -> new AccountNotFoundException("Account not found"));
+        } catch (AccountNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return account;
+    }
+
+
+    @Override
+    public void addBalance(Account account, BigDecimal balance) {
+        account.setBalance(account.getBalance().add(balance));
+    }
+
+    @Override
+    public void subtractBalance(Account account, BigDecimal balance) {
+        if (account.getBalance().compareTo(balance) < 0) {
+            throw new IllegalArgumentException("Saldo insuficiente para saque.");
+        }
+        account.setBalance(account.getBalance().subtract(balance));
     }
 }
