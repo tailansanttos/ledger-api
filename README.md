@@ -1,6 +1,6 @@
 # Ledger de Transações Financeiras
 
-Projeto backend em Java + Spring Boot que simula um **ledger** (livro-razão) com suporte a depósitos, saques e transferências.
+Projeto backend em Java + Spring Boot que simula um **ledger** (livro-razão) com suporte a depósitos e saques.
 
 ## 🎯 Objetivo
 Este projeto foi desenvolvido com foco em **aprendizado**.  
@@ -20,7 +20,6 @@ A ideia é evoluir o sistema por fases, começando pelo básico e adicionando co
 
 ### Fase 2 – Regras de Negócio
 - Validação de saldo suficiente para saques
-- Transferência entre contas
 - Cada cliente só pode ter uma conta
 
 ### Fase 3 – Kafka (Assíncrono)
