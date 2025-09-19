@@ -34,6 +34,14 @@ public class TransactionServiceImpl implements TransactionService {
             throw new InvalidTransactionException("O valor da transação deve ser maior que zero");
         }
 
+        if (transactionRequest.externalId() != null){
+            boolean exists = transactionRepository.existsByExternalId(transactionRequest.externalId());
+            if (exists){
+                Transaction existsTransaction = transactionRepository.findByExternalId(transactionRequest.externalId());
+                return new TransactionResponse(existsTransaction.getId(), existsTransaction.getTransactionType(), existsTransaction.getValue(), existsTransaction.getAccount().getId(), LocalDateTime.now());
+            }
+        }
+
         Account account = getAccount(accountId);
 
         Transaction transaction = new Transaction();
@@ -54,6 +62,14 @@ public class TransactionServiceImpl implements TransactionService {
         BigDecimal valueTransaction = transactionRequest.value();
         if (valueTransaction.compareTo(BigDecimal.ZERO) <= 0) {
             throw new InvalidTransactionException("O valor da transação deve ser maior que zero");
+        }
+
+        if (transactionRequest.externalId() != null){
+            boolean exists = transactionRepository.existsByExternalId(transactionRequest.externalId());
+            if (exists){
+                Transaction existsTransaction = transactionRepository.findByExternalId(transactionRequest.externalId());
+                return new TransactionResponse(existsTransaction.getId(), existsTransaction.getTransactionType(), existsTransaction.getValue(), existsTransaction.getAccount().getId(), LocalDateTime.now());
+            }
         }
 
         Account account = getAccount(accountId);

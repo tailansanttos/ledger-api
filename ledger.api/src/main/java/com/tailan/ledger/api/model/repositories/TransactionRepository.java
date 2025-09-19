@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
+    boolean existsByExternalId(String externalId);
+    Transaction findByExternalId(String externalId);
 }
