@@ -10,6 +10,8 @@ import com.tailan.ledger.api.model.repositories.TransactionRepository;
 import com.tailan.ledger.api.service.AccountService;
 import com.tailan.ledger.api.service.TransactionService;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,6 +20,7 @@ import java.util.UUID;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
+    private static final Logger log = LoggerFactory.getLogger(TransactionServiceImpl.class);
     private final TransactionRepository transactionRepository;
     private final AccountService accountService;
 
@@ -35,12 +38,12 @@ public class TransactionServiceImpl implements TransactionService {
             throw new InvalidTransactionException("O valor da transação deve ser maior que zero");
         }
 
-        if (transactionRequest.externalId() != null){
-            boolean exists = transactionRepository.existsByExternalId(transactionRequest.externalId());
-            if (exists){
-                Transaction existsTransaction = transactionRepository.findByExternalId(transactionRequest.externalId());
-                return new TransactionResponse(existsTransaction.getId(), existsTransaction.getTransactionType(), existsTransaction.getValue(), existsTransaction.getAccount().getId(), LocalDateTime.now());
-            }
+        String externalId = transactionRequest.externalId();
+
+        Transaction existingTransaction = transactionRepository.findByExternalId(externalId);
+        if (existingTransaction != null) {
+            log.warn("Transação idempotente detectada. ExternalId: {}. Retornando resultado anterior.", externalId);
+            return  mapToResponse(existingTransaction);
         }
 
         Account account = getAccount(accountId);
@@ -49,11 +52,12 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setValue(valueTransaction);
         transaction.setTransactionType(TransactionType.INCOME);
         transaction.setAccount(account);
+        transaction.setExternalId(transactionRequest.externalId());
         transaction.setDateTime(LocalDateTime.now());
 
         accountService.addBalance(account, valueTransaction);
         Transaction savedTransaction = transactionRepository.save(transaction);
-        return new TransactionResponse(savedTransaction.getId(), savedTransaction.getTransactionType(), savedTransaction.getValue(), savedTransaction.getAccount().getId(), savedTransaction.getDateTime());
+        return mapToResponse(savedTransaction);
     }
 
     @Transactional
@@ -64,13 +68,12 @@ public class TransactionServiceImpl implements TransactionService {
         if (valueTransaction.compareTo(BigDecimal.ZERO) <= 0) {
             throw new InvalidTransactionException("O valor da transação deve ser maior que zero");
         }
+        String externalId = transactionRequest.externalId();
 
-        if (transactionRequest.externalId() != null){
-            boolean exists = transactionRepository.existsByExternalId(transactionRequest.externalId());
-            if (exists){
-                Transaction existsTransaction = transactionRepository.findByExternalId(transactionRequest.externalId());
-                return new TransactionResponse(existsTransaction.getId(), existsTransaction.getTransactionType(), existsTransaction.getValue(), existsTransaction.getAccount().getId(), LocalDateTime.now());
-            }
+        Transaction existingTransaction = transactionRepository.findByExternalId(externalId);
+        if (existingTransaction != null) {
+            log.warn("Transação idempotente detectada. ExternalId: {}. Retornando resultado anterior.", externalId);
+            return  mapToResponse(existingTransaction);
         }
 
         Account account = getAccount(accountId);
@@ -79,16 +82,24 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setAccount(account);
         transaction.setDateTime(LocalDateTime.now());
         transaction.setTransactionType(TransactionType.EXPENSE);
+        transaction.setExternalId(transactionRequest.externalId());
 
         accountService.subtractBalance(account, valueTransaction);
         Transaction savedTransaction = transactionRepository.save(transaction);
-        return new TransactionResponse(savedTransaction.getId(),
-                savedTransaction.getTransactionType(), savedTransaction.getValue(),
-                savedTransaction.getAccount().getId(), savedTransaction.getDateTime());
+        return mapToResponse(savedTransaction);
     }
 
 
     public Account getAccount(UUID accountId) {
         return accountService.getAccount(accountId);
+    }
+
+    public TransactionResponse mapToResponse(Transaction transaction) {
+        return new TransactionResponse
+                (transaction.getId(),
+                        transaction.getTransactionType(),
+                        transaction.getValue(),
+                        transaction.getAccount().getId(),
+                        transaction.getDateTime());
     }
 }
