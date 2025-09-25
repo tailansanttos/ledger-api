@@ -4,10 +4,11 @@ import com.tailan.ledger.api.model.enums.TransactionType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
-public record TransactionResponse(Long transactionId,
+public record TransactionResponse(UUID transactionId,
                                   TransactionType transactionType,
                                   BigDecimal value,
-                                  Long accountId,
+                                  UUID accountId,
                                   LocalDateTime dateTime) {
 }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Service
 public class AccountServiceIml implements AccountService {
@@ -30,7 +31,7 @@ public class AccountServiceIml implements AccountService {
     }
 
     @Override
-    public Account getAccount(Long accountId) {
+    public Account getAccount(UUID accountId) {
         Account account = null;
         try {
             account = accountRepository.findById(accountId).orElseThrow(() -> new AccountNotFoundException("Account not found"));
@@ -38,6 +39,14 @@ public class AccountServiceIml implements AccountService {
             throw new RuntimeException(e);
         }
         return account;
+    }
+
+    @Override
+    public AccountResponse getAccountDto(UUID accountId) {
+        Account account = getAccount(accountId);
+        return new AccountResponse(account.getId(),
+                account.getHolderName(),
+                account.getBalance());
     }
 
 

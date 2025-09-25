@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -27,7 +28,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Transactional
     @Override
-    public TransactionResponse depositAccount(Long accountId, TransactionRequest transactionRequest) {
+    public TransactionResponse depositAccount(UUID accountId, TransactionRequest transactionRequest) {
         BigDecimal valueTransaction = transactionRequest.value();
 
         if (valueTransaction.compareTo(BigDecimal.ZERO) <= 0) {
@@ -57,7 +58,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Transactional
     @Override
-    public TransactionResponse accountWithdrawal(Long accountId, TransactionRequest transactionRequest) {
+    public TransactionResponse accountWithdrawal(UUID accountId, TransactionRequest transactionRequest) {
 
         BigDecimal valueTransaction = transactionRequest.value();
         if (valueTransaction.compareTo(BigDecimal.ZERO) <= 0) {
@@ -87,7 +88,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
 
-    public Account getAccount(Long accountId) {
+    public Account getAccount(UUID accountId) {
         return accountService.getAccount(accountId);
     }
 }

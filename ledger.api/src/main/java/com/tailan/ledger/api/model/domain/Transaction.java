@@ -5,13 +5,14 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "transactions")
 public class Transaction {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
     @Column(unique = true)
     private String externalId;
 
@@ -24,6 +25,23 @@ public class Transaction {
     private BigDecimal value;
 
     public Transaction() {
+    }
+
+    public Transaction(UUID id, String externalId, Account account, TransactionType transactionType, LocalDateTime dateTime, BigDecimal value) {
+        this.id = id;
+        this.externalId = externalId;
+        this.account = account;
+        this.transactionType = transactionType;
+        this.dateTime = dateTime;
+        this.value = value;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public BigDecimal getValue() {
@@ -42,14 +60,6 @@ public class Transaction {
         this.externalId = externalId;
     }
 
-    public Transaction(Long id, String externalId, Account account, TransactionType transactionType, LocalDateTime dateTime, BigDecimal value) {
-        this.id = id;
-        this.externalId = externalId;
-        this.account = account;
-        this.transactionType = transactionType;
-        this.dateTime = dateTime;
-        this.value = value;
-    }
 
     public LocalDateTime getDateTime() {
         return dateTime;
@@ -59,13 +69,7 @@ public class Transaction {
         this.dateTime = dateTime;
     }
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Account getAccount() {
         return account;
