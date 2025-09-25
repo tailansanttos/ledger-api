@@ -68,6 +68,7 @@ public class TransactionServiceImpl implements TransactionService {
         if (valueTransaction.compareTo(BigDecimal.ZERO) <= 0) {
             throw new InvalidTransactionException("O valor da transação deve ser maior que zero");
         }
+
         String externalId = transactionRequest.externalId();
 
         Transaction existingTransaction = transactionRepository.findByExternalId(externalId);

@@ -2,6 +2,7 @@ package com.tailan.ledger.api.service.impl;
 
 import com.tailan.ledger.api.dtos.account.AccountRequest;
 import com.tailan.ledger.api.dtos.account.AccountResponse;
+import com.tailan.ledger.api.exceptions.exception.InvalidTransactionException;
 import com.tailan.ledger.api.model.domain.Account;
 import com.tailan.ledger.api.model.repositories.AccountRepository;
 import com.tailan.ledger.api.service.AccountService;
@@ -58,7 +59,7 @@ public class AccountServiceIml implements AccountService {
     @Override
     public void subtractBalance(Account account, BigDecimal balance) {
         if (account.getBalance().compareTo(balance) < 0) {
-            throw new IllegalArgumentException("Saldo insuficiente para saque.");
+            throw new InvalidTransactionException("Saldo insuficiente para saque.");
         }
         account.setBalance(account.getBalance().subtract(balance));
     }
