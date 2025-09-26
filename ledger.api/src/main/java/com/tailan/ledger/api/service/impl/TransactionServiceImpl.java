@@ -12,6 +12,10 @@ import com.tailan.ledger.api.service.TransactionService;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -90,6 +94,14 @@ public class TransactionServiceImpl implements TransactionService {
         return mapToResponse(savedTransaction);
     }
 
+    @Override
+    public Page<TransactionResponse> getExtract(UUID accountId, int page, int size) {
+        Account account = getAccount(accountId);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateTime"));
+        Page<Transaction> getExtract = transactionRepository.findAllByAccount(account, pageable);
+        return getExtract.map(this::mapToResponse);
+    }
 
     public Account getAccount(UUID accountId) {
         return accountService.getAccount(accountId);
